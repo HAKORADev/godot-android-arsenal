@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bjhkuarri8g88"
-path="res://.godot/imported/spudnik.png-a455c959747e569a8bd012229892288a.ctex"
+uid="uid://du8mi4n7ax1lc"
+path="res://.godot/imported/hero_frostbite_f2.png-cc16539d3651b67737cb0397ef292ccc.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/games/cosmic_spud/hero/spudnik.png"
-dest_files=["res://.godot/imported/spudnik.png-a455c959747e569a8bd012229892288a.ctex"]
+source_file="res://assets/games/cosmic_spud/hero/hero_frostbite_f2.png"
+dest_files=["res://.godot/imported/hero_frostbite_f2.png-cc16539d3651b67737cb0397ef292ccc.ctex"]
 
 [params]
 

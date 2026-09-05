@@ -1,302 +1,312 @@
 {
-  "schema": 2,
-  "project": "gogabox",
-  "_doc": "Every visual/audio asset the MATCHER and COSMIC SPUD games wear, where it came from, its license, and how to re-fetch or re-derive it. Re-derive: python3 tools/v033p3_art.py + python3 tools/v033p3_sfx.py (patch 3 re-derives the p1/p2 set too). All sources CC0 or the owner's own upload. COSMIC SPUD (v0.3.4) re-derive: python3 tools/v034_cs_art.py + python3 tools/v034_cs_audio.py (the raw hunt cache lives outside the repo; the manifest lines below carry the sources).",
-  "sources": [
-    {
-      "id": "kenney-fonts",
-      "name": "Kenney - Kenney Fonts pack",
-      "url": "https://kenney.nl/assets/kenney-fonts",
-      "zip": "https://kenney.nl/media/pages/assets/kenney-fonts/8d5435c213-1677661710/kenney_kenney-fonts.zip",
-      "license": "CC0 1.0 Universal",
-      "used_for": "assets/fonts/Kenney_Rocket.ttf (display font, menu/titles), assets/fonts/Kenney_Mini.ttf (UI font, chips/labels); also used inside PIL thumbnails"
-    },
-    {
-      "id": "vendored-candyrush-cc0-audio",
-      "name": "CC0 audio already vendored in projects/candyrush (originally Kenney Interface Sounds / Music Jingles, OpenGameArt pops + Happy Adventure loop, synth gaps)",
-      "url": "https://kenney.nl/assets/interface-sounds ; https://kenney.nl/assets/music-jingles ; https://opengameart.org (see projects/candyrush/assets.manifest.json for exact URLs)",
-      "license": "CC0 1.0 Universal",
-      "used_for": "assets/audio/ui/{click,confirm,buy,error}.ogg, assets/audio/jingles/{win,lose}.*, assets/audio/sfx/{boom,coin,sparkle,star,swap,pop*}.*, assets/audio/music/box_theme.mp3"
-    },
-    {
-      "id": "oga-pixel-fruit-pack",
-      "name": "OpenGameArt - Pixel Fruit Pack (via candyrush vendored copies)",
-      "url": "https://opengameart.org/content/pixel-fruit-pack",
-      "license": "CC0 1.0 Universal",
-      "used_for": "Fruit Slasher fruit_0..4 (upscaled 160px); fruit_gold is a deterministic gold recolor of fruit_0"
-    },
-    {
-      "id": "pil-drawn",
-      "name": "Deterministic PIL drawings (this repo, tools/derive_assets.py + tools/make_brand.py)",
-      "license": "CC0 (project-authored)",
-      "used_for": "box chrome (bg_main, logo, coin, lock/gear/trophy icons, splash, mystery tile art), snake apple/body/head x4 skins, lanes ship+block, rally ball+paddle, hopper platform+player, slasher bomb, all 14 menu thumbnails (6 games + 8 workshop teasers), icon.svg, app icon set (icons/ - chunky letter-G from the Kenney Mini font via tools/make_brand.py), android notification glyph, meta vocabulary icons (assets/meta/: genres arcade/action/puzzle/adventure/shooter/racing/kids/music/story, subs retro/singleplayer/survival/competitive/hacknslash/platformer/minimal/turnbased, age ratings everyone/kids/teens, search glyph)"
-    },
-    {
-      "id": "synth-sfx",
-      "name": "numpy-synthesized sfx (this repo, tools/derive_assets.py)",
-      "license": "CC0 (project-authored)",
-      "used_for": "assets/audio/sfx/hop.wav (up-chirp), assets/audio/sfx/land.wav (soft thud)"
-    },
-    {
-      "id": "kenney-space-shooter-redux",
-      "name": "Kenney - Space Shooter Redux (OpenGameArt mirror of the kenney.nl pack)",
-      "url": "https://opengameart.org/content/space-shooter-redux",
-      "zip": "https://opengameart.org/sites/default/files/SpaceShooterRedux.zip",
-      "license": "CC0 1.0 Universal",
-      "used_for": "assets/games/lanes/: enemy hulls (10), 3 player hulls, laser bolts, shield bubble frames, fire animation frames, speed line, power-up/pill loot icons (Space Dash v0.2.4)"
-    },
-    {
-      "id": "kenney-space-shooter-extension",
-      "name": "Kenney - Space Shooter Extension 250+ (OpenGameArt)",
-      "url": "https://opengameart.org/content/space-shooter-extension-250",
-      "zip": "https://opengameart.org/sites/default/files/kenney_spaceShooterExtension.zip",
-      "license": "CC0 1.0 Universal",
-      "used_for": "assets/games/lanes/: 4 more player ship skins, the bomb missile + its loot icon (Space Dash v0.2.4)"
-    },
-    {
-      "id": "kenney-particle-pack",
-      "name": "Kenney - Particle Pack",
-      "url": "https://kenney.nl/assets/particle-pack",
-      "license": "CC0 1.0 Universal",
-      "used_for": "assets/games/lanes/fx_{flare,spark,smoke,star}.png - the tintable glow workhorses behind Space Dash's code VFX"
-    },
-    {
-      "id": "invaders-ships",
-      "name": "Space Invaders crew hulls (derived from the vendored Kenney sets)",
-      "url": "https://kenney.nl/assets/space-shooter-redux",
-      "zip": null,
-      "license": "CC0 1.0 Universal",
-      "used_for": "assets/games/invaders/ship_*.png - the 7 SSDS hulls are hue/recolor/glow/mount edits of the SAME Kenney hulls vendored for lanes (kenney-space-shooter-redux + extension), applied by tools/v032_invaders_art.py per the owner's 'edit some ships and change their size and colors' call. Everything else in assets/games/invaders/ is painted from scratch by that tool (CC0-clean).",
-      "origin": "local:derived"
-    },
-    {
-      "id": "owner-match3-template",
-      "name": "Match_3_Template.zip (owner-provided, uploaded to the session)",
-      "url": "owner upload (GameMaker sprite package: donuts, play-field tiles, background, banner ribbon)",
-      "license": "owner-provided for GOGABox use",
-      "used_for": "assets/games/matcher/gems/donut_0..4.png (the Donut Den skin gems), assets/games/matcher/bg/cell_donut_light.png + cell_donut_dark.png (the checker cells), assets/games/matcher/bg/bg_donut.png (the skin backdrop, cover-cropped 1080x1920), assets/games/matcher/fx/banner.png (the top event ribbon)"
-    },
-    {
-      "id": "owner-match3-template-zip",
-      "name": "The owner's Match_3_Template.zip (uploaded to the sandbox, re-hosted on his gdrive)",
-      "url": "(owner upload - GameMaker template project)",
-      "license": "the owner's own asset drop - project use",
-      "used_for": "v0.3.3-p3 THE DEFAULTS: bg/cell_tpl_light+dark (the board checker), bg/bg_tpl (the default backdrop), fx/popfx_0..7 (the pop burst frames), the richer gems/donut_0..4 (objective tokens), matcher_game.mp3 (the in-game music), and most SFX: m_swap, m_land, m_pop_candy, m_match_soft/big, m_invalid, m_tok_bomb, m_tok_whoosh, m_arm, m_shuffle, m_freeze, m_jelly_spread, m_gulp, m_special, m_goal, m_win_fanfare, m_lose_org, m_ui, m_ui_close"
-    },
-    {
-      "id": "cs-kenney-sprites",
-      "name": "Kenney - Top-down Shooter + Top-down Tanks + RTS Sci-fi + Tower Defense + Particle Pack (via GitHub mirrors of the kenney.nl packs; kenney.nl itself blocks curl)",
-      "url": "https://kenney.nl/assets/topdown-shooter ; mirrors on github.com (see download/cs_assets/MANIFEST.md for exact mirror URLs)",
-      "license": "CC0 1.0 Universal",
-      "used_for": "assets/games/cosmic_spud/fx/* (the particle pack subset: circle/dirt/fire/flame/flare/light/smoke/star/muzzle, downscaled 128px) - the enemy/unit/hero/weapon/bullet/ground sprites are PIL-DRAWN in the same style (tools/v034_cs_art.py)"
-    },
-    {
-      "id": "cs-oga-cc0",
-      "name": "OpenGameArt CC0 - the audio hunt (music loops + gun impacts)",
-      "url": "https://opengameart.org/ (exact per-file URLs in download/cs_assets/MANIFEST.md)",
-      "license": "CC0 1.0 Universal",
-      "used_for": "assets/audio/music/cs_desert_day.ogg (desert_loop.mp3), cs_desert_night.ogg (manaosdrone1.ogg), cs_park_day.ogg (musicbox3_sad_tune.ogg), cs_park_night.ogg (aurora.mp3), cs_boss.ogg (Cinematic_percussion_loop_2.wav) - all ffmpeg-converted to ogg 128k; assets/audio/sfx/cs_wave_horn.wav (call_to_war.wav trimmed 0-4s), cs_shot_*.wav (impacts_gun pack), cs_shield_crack/cs_crit/cs_hit.ogg (kenney impact pack), cs_buy/cs_draft/cs_hover (kenney ui), cs_xp/cs_levelup/cs_heal/cs_error/cs_death (kenney digital), cs_coin/cs_sell (kenney rpg), cs_shot_laser/cs_shot_minigun/cs_boom/cs_boom_big/cs_aura/cs_shield_up/cs_charge/cs_burn/cs_flash/cs_kill_big (kenney sci-fi)"
-    },
-    {
-      "id": "cs-synth",
-      "name": "numpy-synthesized gaps (tools/v034_cs_audio.py, 44.1k stereo WAV)",
-      "url": "this repo",
-      "license": "HAKORADev (same as the code)",
-      "used_for": "cs_hurt.wav (player grunt), cs_boss_roar.wav (layered saw growl), cs_frost.wav (icy shimmer), cs_rail.wav (charge+crack), cs_tick.wav (aura thump)"
-    }
-  ],
-  "audit": {
-    "policy": "CC0-only, vendored, no network fetch at runtime",
-    "fonts": "Kenney Fonts (CC0) vendored as TTF",
-    "music": "1 box theme loop (CC0, via candyrush vendored copy); games share jingles+sfx pool",
-    "note": "Audio kept deliberately small for v0.0.1; per-game music is a roadmap item (Docs/ideas)"
+ "schema": 2,
+ "project": "gogabox",
+ "_doc": "Every visual/audio asset the MATCHER and COSMIC SPUD games wear, where it came from, its license, and how to re-fetch or re-derive it. Re-derive: python3 tools/v033p3_art.py + python3 tools/v033p3_sfx.py (patch 3 re-derives the p1/p2 set too). All sources CC0 or the owner's own upload. COSMIC SPUD (v0.3.4) re-derive: python3 tools/v034_cs_art.py + python3 tools/v034_cs_audio.py (the raw hunt cache lives outside the repo; the manifest lines below carry the sources).",
+ "sources": [
+  {
+   "id": "kenney-fonts",
+   "name": "Kenney - Kenney Fonts pack",
+   "url": "https://kenney.nl/assets/kenney-fonts",
+   "zip": "https://kenney.nl/media/pages/assets/kenney-fonts/8d5435c213-1677661710/kenney_kenney-fonts.zip",
+   "license": "CC0 1.0 Universal",
+   "used_for": "assets/fonts/Kenney_Rocket.ttf (display font, menu/titles), assets/fonts/Kenney_Mini.ttf (UI font, chips/labels); also used inside PIL thumbnails"
   },
-  "files": {
-    "assets/games/lanes/ship_orange.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/playerShip1_orange.png"
-    },
-    "assets/games/lanes/ship_blue.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/playerShip2_blue.png"
-    },
-    "assets/games/lanes/ship_green.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/playerShip3_green.png"
-    },
-    "assets/games/lanes/ship_veteran.png": {
-      "source": "kenney-space-shooter-extension",
-      "origin": "PNG/Sprites/Ships/spaceShips_001.png"
-    },
-    "assets/games/lanes/ship_phantom.png": {
-      "source": "kenney-space-shooter-extension",
-      "origin": "PNG/Sprites/Ships/spaceShips_004.png"
-    },
-    "assets/games/lanes/ship_titan.png": {
-      "source": "kenney-space-shooter-extension",
-      "origin": "PNG/Sprites/Ships/spaceShips_007.png"
-    },
-    "assets/games/lanes/ship_horn.png": {
-      "source": "kenney-space-shooter-extension",
-      "origin": "PNG/Sprites/Ships/spaceShips_009.png"
-    },
-    "assets/games/lanes/enemy_grunt.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/Enemies/enemyBlack1.png"
-    },
-    "assets/games/lanes/enemy_grunt2.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/Enemies/enemyBlue2.png"
-    },
-    "assets/games/lanes/enemy_runner.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/Enemies/enemyGreen3.png"
-    },
-    "assets/games/lanes/enemy_shooter.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/Enemies/enemyBlue1.png"
-    },
-    "assets/games/lanes/enemy_splitter.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/Enemies/enemyRed4.png"
-    },
-    "assets/games/lanes/enemy_tank.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/Enemies/enemyBlack5.png"
-    },
-    "assets/games/lanes/enemy_shielded.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/Enemies/enemyGreen1.png"
-    },
-    "assets/games/lanes/enemy_shatter.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/Enemies/enemyRed3.png"
-    },
-    "assets/games/lanes/enemy_ufo_red.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/ufoRed.png"
-    },
-    "assets/games/lanes/enemy_ufo_green.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/ufoGreen.png"
-    },
-    "assets/games/lanes/enemy_ufo_yellow.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/ufoYellow.png"
-    },
-    "assets/games/lanes/laser_red_bolt.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/Lasers/laserRed04.png"
-    },
-    "assets/games/lanes/enemy_bolt.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/Lasers/laserRed07.png"
-    },
-    "assets/games/lanes/bomb.png": {
-      "source": "kenney-space-shooter-extension",
-      "origin": "PNG/Sprites/Missiles/spaceMissiles_021.png"
-    },
-    "assets/games/lanes/item_power.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/Power-ups/pill_blue.png"
-    },
-    "assets/games/lanes/item_shield.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/Effects/shield1.png"
-    },
-    "assets/games/lanes/item_laser.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/Power-ups/powerupRed.png"
-    },
-    "assets/games/lanes/item_thunder.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/Power-ups/bold_silver.png"
-    },
-    "assets/games/lanes/item_bomb.png": {
-      "source": "kenney-space-shooter-extension",
-      "origin": "PNG/Sprites/Missiles/spaceMissiles_025.png"
-    },
-    "assets/games/lanes/shield_1.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/Effects/shield1.png"
-    },
-    "assets/games/lanes/shield_2.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/Effects/shield2.png"
-    },
-    "assets/games/lanes/shield_3.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/Effects/shield3.png"
-    },
-    "assets/games/lanes/fx_flare.png": {
-      "source": "kenney-particle-pack",
-      "origin": "PNG (Transparent)/flare_01.png"
-    },
-    "assets/games/lanes/fx_spark.png": {
-      "source": "kenney-particle-pack",
-      "origin": "PNG (Transparent)/spark_04.png"
-    },
-    "assets/games/lanes/fx_smoke.png": {
-      "source": "kenney-particle-pack",
-      "origin": "PNG (Transparent)/smoke_04.png"
-    },
-    "assets/games/lanes/fx_star.png": {
-      "source": "kenney-particle-pack",
-      "origin": "PNG (Transparent)/star_04.png"
-    },
-    "assets/games/lanes/speedline.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/Effects/speed.png"
-    },
-    "assets/games/lanes/fire_00.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/Effects/fire00.png"
-    },
-    "assets/games/lanes/fire_02.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/Effects/fire02.png"
-    },
-    "assets/games/lanes/fire_04.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/Effects/fire04.png"
-    },
-    "assets/games/lanes/fire_06.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/Effects/fire06.png"
-    },
-    "assets/games/lanes/fire_08.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/Effects/fire08.png"
-    },
-    "assets/games/lanes/fire_10.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/Effects/fire10.png"
-    },
-    "assets/games/lanes/fire_12.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/Effects/fire12.png"
-    },
-    "assets/games/lanes/fire_14.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/Effects/fire14.png"
-    },
-    "assets/games/lanes/fire_16.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/Effects/fire16.png"
-    },
-    "assets/games/lanes/fire_18.png": {
-      "source": "kenney-space-shooter-redux",
-      "origin": "PNG/Effects/fire18.png"
-    },
-    "assets/games/lanes/laser_yellow.png": {
-      "source": "generated",
-      "tool": "tools/v024_vendor.py",
-      "origin": "hue-rotated recolor of PNG/Lasers/laserGreen04.png (green -> yellow)"
-    },
-    "assets/games/lanes/laser_thunder.png": {
-      "source": "generated",
-      "tool": "tools/v024_vendor.py",
-      "origin": "desaturate+lift recolor of PNG/Lasers/laserBlue04.png (blue -> thunder white)"
-    }
+  {
+   "id": "vendored-candyrush-cc0-audio",
+   "name": "CC0 audio already vendored in projects/candyrush (originally Kenney Interface Sounds / Music Jingles, OpenGameArt pops + Happy Adventure loop, synth gaps)",
+   "url": "https://kenney.nl/assets/interface-sounds ; https://kenney.nl/assets/music-jingles ; https://opengameart.org (see projects/candyrush/assets.manifest.json for exact URLs)",
+   "license": "CC0 1.0 Universal",
+   "used_for": "assets/audio/ui/{click,confirm,buy,error}.ogg, assets/audio/jingles/{win,lose}.*, assets/audio/sfx/{boom,coin,sparkle,star,swap,pop*}.*, assets/audio/music/box_theme.mp3"
+  },
+  {
+   "id": "oga-pixel-fruit-pack",
+   "name": "OpenGameArt - Pixel Fruit Pack (via candyrush vendored copies)",
+   "url": "https://opengameart.org/content/pixel-fruit-pack",
+   "license": "CC0 1.0 Universal",
+   "used_for": "Fruit Slasher fruit_0..4 (upscaled 160px); fruit_gold is a deterministic gold recolor of fruit_0"
+  },
+  {
+   "id": "pil-drawn",
+   "name": "Deterministic PIL drawings (this repo, tools/derive_assets.py + tools/make_brand.py)",
+   "license": "CC0 (project-authored)",
+   "used_for": "box chrome (bg_main, logo, coin, lock/gear/trophy icons, splash, mystery tile art), snake apple/body/head x4 skins, lanes ship+block, rally ball+paddle, hopper platform+player, slasher bomb, all 14 menu thumbnails (6 games + 8 workshop teasers), icon.svg, app icon set (icons/ - chunky letter-G from the Kenney Mini font via tools/make_brand.py), android notification glyph, meta vocabulary icons (assets/meta/: genres arcade/action/puzzle/adventure/shooter/racing/kids/music/story, subs retro/singleplayer/survival/competitive/hacknslash/platformer/minimal/turnbased, age ratings everyone/kids/teens, search glyph)"
+  },
+  {
+   "id": "synth-sfx",
+   "name": "numpy-synthesized sfx (this repo, tools/derive_assets.py)",
+   "license": "CC0 (project-authored)",
+   "used_for": "assets/audio/sfx/hop.wav (up-chirp), assets/audio/sfx/land.wav (soft thud)"
+  },
+  {
+   "id": "kenney-space-shooter-redux",
+   "name": "Kenney - Space Shooter Redux (OpenGameArt mirror of the kenney.nl pack)",
+   "url": "https://opengameart.org/content/space-shooter-redux",
+   "zip": "https://opengameart.org/sites/default/files/SpaceShooterRedux.zip",
+   "license": "CC0 1.0 Universal",
+   "used_for": "assets/games/lanes/: enemy hulls (10), 3 player hulls, laser bolts, shield bubble frames, fire animation frames, speed line, power-up/pill loot icons (Space Dash v0.2.4)"
+  },
+  {
+   "id": "kenney-space-shooter-extension",
+   "name": "Kenney - Space Shooter Extension 250+ (OpenGameArt)",
+   "url": "https://opengameart.org/content/space-shooter-extension-250",
+   "zip": "https://opengameart.org/sites/default/files/kenney_spaceShooterExtension.zip",
+   "license": "CC0 1.0 Universal",
+   "used_for": "assets/games/lanes/: 4 more player ship skins, the bomb missile + its loot icon (Space Dash v0.2.4)"
+  },
+  {
+   "id": "kenney-particle-pack",
+   "name": "Kenney - Particle Pack",
+   "url": "https://kenney.nl/assets/particle-pack",
+   "license": "CC0 1.0 Universal",
+   "used_for": "assets/games/lanes/fx_{flare,spark,smoke,star}.png - the tintable glow workhorses behind Space Dash's code VFX"
+  },
+  {
+   "id": "invaders-ships",
+   "name": "Space Invaders crew hulls (derived from the vendored Kenney sets)",
+   "url": "https://kenney.nl/assets/space-shooter-redux",
+   "zip": null,
+   "license": "CC0 1.0 Universal",
+   "used_for": "assets/games/invaders/ship_*.png - the 7 SSDS hulls are hue/recolor/glow/mount edits of the SAME Kenney hulls vendored for lanes (kenney-space-shooter-redux + extension), applied by tools/v032_invaders_art.py per the owner's 'edit some ships and change their size and colors' call. Everything else in assets/games/invaders/ is painted from scratch by that tool (CC0-clean).",
+   "origin": "local:derived"
+  },
+  {
+   "id": "owner-match3-template",
+   "name": "Match_3_Template.zip (owner-provided, uploaded to the session)",
+   "url": "owner upload (GameMaker sprite package: donuts, play-field tiles, background, banner ribbon)",
+   "license": "owner-provided for GOGABox use",
+   "used_for": "assets/games/matcher/gems/donut_0..4.png (the Donut Den skin gems), assets/games/matcher/bg/cell_donut_light.png + cell_donut_dark.png (the checker cells), assets/games/matcher/bg/bg_donut.png (the skin backdrop, cover-cropped 1080x1920), assets/games/matcher/fx/banner.png (the top event ribbon)"
+  },
+  {
+   "id": "owner-match3-template-zip",
+   "name": "The owner's Match_3_Template.zip (uploaded to the sandbox, re-hosted on his gdrive)",
+   "url": "(owner upload - GameMaker template project)",
+   "license": "the owner's own asset drop - project use",
+   "used_for": "v0.3.3-p3 THE DEFAULTS: bg/cell_tpl_light+dark (the board checker), bg/bg_tpl (the default backdrop), fx/popfx_0..7 (the pop burst frames), the richer gems/donut_0..4 (objective tokens), matcher_game.mp3 (the in-game music), and most SFX: m_swap, m_land, m_pop_candy, m_match_soft/big, m_invalid, m_tok_bomb, m_tok_whoosh, m_arm, m_shuffle, m_freeze, m_jelly_spread, m_gulp, m_special, m_goal, m_win_fanfare, m_lose_org, m_ui, m_ui_close"
+  },
+  {
+   "id": "cs-kenney-sprites",
+   "name": "Kenney - Top-down Shooter + Top-down Tanks + RTS Sci-fi + Tower Defense + Particle Pack (via GitHub mirrors of the kenney.nl packs; kenney.nl itself blocks curl)",
+   "url": "https://kenney.nl/assets/topdown-shooter ; mirrors on github.com (see download/cs_assets/MANIFEST.md for exact mirror URLs)",
+   "license": "CC0 1.0 Universal",
+   "used_for": "assets/games/cosmic_spud/fx/* (the particle pack subset: circle/dirt/fire/flame/flare/light/smoke/star/muzzle, downscaled 128px) - the enemy/unit/hero/weapon/bullet/ground sprites are PIL-DRAWN in the same style (tools/v034_cs_art.py)"
+  },
+  {
+   "id": "cs-oga-cc0",
+   "name": "OpenGameArt CC0 - the audio hunt (music loops + gun impacts)",
+   "url": "https://opengameart.org/ (exact per-file URLs in download/cs_assets/MANIFEST.md)",
+   "license": "CC0 1.0 Universal",
+   "used_for": "assets/audio/music/cs_desert_day.ogg (desert_loop.mp3), cs_desert_night.ogg (manaosdrone1.ogg), cs_park_day.ogg (musicbox3_sad_tune.ogg), cs_park_night.ogg (aurora.mp3), cs_boss.ogg (Cinematic_percussion_loop_2.wav) - all ffmpeg-converted to ogg 128k; assets/audio/sfx/cs_wave_horn.wav (call_to_war.wav trimmed 0-4s), cs_shot_*.wav (impacts_gun pack), cs_shield_crack/cs_crit/cs_hit.ogg (kenney impact pack), cs_buy/cs_draft/cs_hover (kenney ui), cs_xp/cs_levelup/cs_heal/cs_error/cs_death (kenney digital), cs_coin/cs_sell (kenney rpg), cs_shot_laser/cs_shot_minigun/cs_boom/cs_boom_big/cs_aura/cs_shield_up/cs_charge/cs_burn/cs_flash/cs_kill_big (kenney sci-fi)"
+  },
+  {
+   "id": "cs-synth",
+   "name": "numpy-synthesized gaps (tools/v034_cs_audio.py, 44.1k stereo WAV)",
+   "url": "this repo",
+   "license": "HAKORADev (same as the code)",
+   "used_for": "cs_hurt.wav (player grunt), cs_boss_roar.wav (layered saw growl), cs_frost.wav (icy shimmer), cs_rail.wav (charge+crack), cs_tick.wav (aura thump)"
   }
+ ],
+ "audit": {
+  "policy": "CC0-only, vendored, no network fetch at runtime",
+  "fonts": "Kenney Fonts (CC0) vendored as TTF",
+  "music": "1 box theme loop (CC0, via candyrush vendored copy); games share jingles+sfx pool",
+  "note": "Audio kept deliberately small for v0.0.1; per-game music is a roadmap item (Docs/ideas)"
+ },
+ "files": {
+  "assets/games/lanes/ship_orange.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/playerShip1_orange.png"
+  },
+  "assets/games/lanes/ship_blue.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/playerShip2_blue.png"
+  },
+  "assets/games/lanes/ship_green.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/playerShip3_green.png"
+  },
+  "assets/games/lanes/ship_veteran.png": {
+   "source": "kenney-space-shooter-extension",
+   "origin": "PNG/Sprites/Ships/spaceShips_001.png"
+  },
+  "assets/games/lanes/ship_phantom.png": {
+   "source": "kenney-space-shooter-extension",
+   "origin": "PNG/Sprites/Ships/spaceShips_004.png"
+  },
+  "assets/games/lanes/ship_titan.png": {
+   "source": "kenney-space-shooter-extension",
+   "origin": "PNG/Sprites/Ships/spaceShips_007.png"
+  },
+  "assets/games/lanes/ship_horn.png": {
+   "source": "kenney-space-shooter-extension",
+   "origin": "PNG/Sprites/Ships/spaceShips_009.png"
+  },
+  "assets/games/lanes/enemy_grunt.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/Enemies/enemyBlack1.png"
+  },
+  "assets/games/lanes/enemy_grunt2.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/Enemies/enemyBlue2.png"
+  },
+  "assets/games/lanes/enemy_runner.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/Enemies/enemyGreen3.png"
+  },
+  "assets/games/lanes/enemy_shooter.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/Enemies/enemyBlue1.png"
+  },
+  "assets/games/lanes/enemy_splitter.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/Enemies/enemyRed4.png"
+  },
+  "assets/games/lanes/enemy_tank.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/Enemies/enemyBlack5.png"
+  },
+  "assets/games/lanes/enemy_shielded.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/Enemies/enemyGreen1.png"
+  },
+  "assets/games/lanes/enemy_shatter.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/Enemies/enemyRed3.png"
+  },
+  "assets/games/lanes/enemy_ufo_red.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/ufoRed.png"
+  },
+  "assets/games/lanes/enemy_ufo_green.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/ufoGreen.png"
+  },
+  "assets/games/lanes/enemy_ufo_yellow.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/ufoYellow.png"
+  },
+  "assets/games/lanes/laser_red_bolt.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/Lasers/laserRed04.png"
+  },
+  "assets/games/lanes/enemy_bolt.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/Lasers/laserRed07.png"
+  },
+  "assets/games/lanes/bomb.png": {
+   "source": "kenney-space-shooter-extension",
+   "origin": "PNG/Sprites/Missiles/spaceMissiles_021.png"
+  },
+  "assets/games/lanes/item_power.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/Power-ups/pill_blue.png"
+  },
+  "assets/games/lanes/item_shield.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/Effects/shield1.png"
+  },
+  "assets/games/lanes/item_laser.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/Power-ups/powerupRed.png"
+  },
+  "assets/games/lanes/item_thunder.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/Power-ups/bold_silver.png"
+  },
+  "assets/games/lanes/item_bomb.png": {
+   "source": "kenney-space-shooter-extension",
+   "origin": "PNG/Sprites/Missiles/spaceMissiles_025.png"
+  },
+  "assets/games/lanes/shield_1.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/Effects/shield1.png"
+  },
+  "assets/games/lanes/shield_2.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/Effects/shield2.png"
+  },
+  "assets/games/lanes/shield_3.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/Effects/shield3.png"
+  },
+  "assets/games/lanes/fx_flare.png": {
+   "source": "kenney-particle-pack",
+   "origin": "PNG (Transparent)/flare_01.png"
+  },
+  "assets/games/lanes/fx_spark.png": {
+   "source": "kenney-particle-pack",
+   "origin": "PNG (Transparent)/spark_04.png"
+  },
+  "assets/games/lanes/fx_smoke.png": {
+   "source": "kenney-particle-pack",
+   "origin": "PNG (Transparent)/smoke_04.png"
+  },
+  "assets/games/lanes/fx_star.png": {
+   "source": "kenney-particle-pack",
+   "origin": "PNG (Transparent)/star_04.png"
+  },
+  "assets/games/lanes/speedline.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/Effects/speed.png"
+  },
+  "assets/games/lanes/fire_00.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/Effects/fire00.png"
+  },
+  "assets/games/lanes/fire_02.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/Effects/fire02.png"
+  },
+  "assets/games/lanes/fire_04.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/Effects/fire04.png"
+  },
+  "assets/games/lanes/fire_06.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/Effects/fire06.png"
+  },
+  "assets/games/lanes/fire_08.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/Effects/fire08.png"
+  },
+  "assets/games/lanes/fire_10.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/Effects/fire10.png"
+  },
+  "assets/games/lanes/fire_12.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/Effects/fire12.png"
+  },
+  "assets/games/lanes/fire_14.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/Effects/fire14.png"
+  },
+  "assets/games/lanes/fire_16.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/Effects/fire16.png"
+  },
+  "assets/games/lanes/fire_18.png": {
+   "source": "kenney-space-shooter-redux",
+   "origin": "PNG/Effects/fire18.png"
+  },
+  "assets/games/lanes/laser_yellow.png": {
+   "source": "generated",
+   "tool": "tools/v024_vendor.py",
+   "origin": "hue-rotated recolor of PNG/Lasers/laserGreen04.png (green -> yellow)"
+  },
+  "assets/games/lanes/laser_thunder.png": {
+   "source": "generated",
+   "tool": "tools/v024_vendor.py",
+   "origin": "desaturate+lift recolor of PNG/Lasers/laserBlue04.png (blue -> thunder white)"
+  },
+  "assets/games/cosmic_spud": {
+   "provenance": "v0.3.4-1 THE ART REBIRTH: every sprite regenerated by tools/v034p1_art.py (the repo's own generator, CC0 - our own pixels). The shading engine: silhouette -> gradient base -> light/shadow bands -> dark outline -> rim light; 4x supersampled.",
+   "zip_parts": {
+    "bullets/spit.png": "Twin_Stick_Shooter_Template.zip (owner-uploaded) spr_enemy_fireball, as-is",
+    "props/crystal_1.png": "Twin_Stick_Shooter_Template.zip spr_obstacle_1, as-is",
+    "props/crystal_2.png": "Twin_Stick_Shooter_Template.zip spr_obstacle_2, as-is",
+    "props/crystal_3.png": "Twin_Stick_Shooter_Template.zip spr_obstacle_3, as-is"
+   },
+   "notes": "spudnik.png deleted (the 6 hero_<start>_f<k>.png walk sets replaced it). The cosmic coin (pickups/coin.png) is a NEW design: a gold coin with a potato embossed in the middle - deliberately NOT the box's gogacoin (assets/ui/coin.png)."
+  }
+ }
 }

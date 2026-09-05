@@ -275,3 +275,43 @@ the game's coins.
    stick, combat, enemies, bosses, waves) → drafts/shops/tree UIs →
    themes → VFX/SFX/music → probes (cs_probe.gd: deterministic model
    tests) → flow_test wiring → thumbs → v0.3.4.
+
+---
+
+## 14. PATCH 1 (v0.3.4-1, the owner's playtest round — the law)
+
+The owner's v0.3.4 verdict: 0.5/10. The full defect list + the fixes live in
+`cosmic_spud_patch1.md` (the tracker). The standing laws this patch added:
+
+- **THE NODE-SYNC LAW** — every entity's sprite follows its logical body
+  EVERY tick (v0.3.4 shipped frozen sprites + invisible walkers). The probe
+  asserts it, the flocking pass included.
+- **THE GAME'S OWN FACE** — gray field, black inner boxes, text only in
+  white/green/red/blue/yellow. The CSUI kit builds every game screen; the
+  GOGABox ui_kit renders NOTHING inside this game. (The box's top bar +
+  pause stay box chrome - that is the frame, not the game.)
+- **THE CS SHEET STACK** — the game owns its modal system (dim + gray panel
+  + black boxes + X). Android back closes the top sheet first.
+- **THE STAY-INVISIBLE STICK** — the ghost drawing is deleted. Born under
+  any touch, nothing ever renders.
+- **THE STORE SHAPE** — THE SHOP (in-run) and THE ARMORY (meta) both follow
+  the owner's example HTML: fat balance header, stat chips, rarity-bordered
+  cards, loadout with SELL, REROLL + START actions. "GOGASHOP" is a dead
+  name.
+- **THE RARITY LAW** — common/uncommon/rare/epic/legendary price mults +
+  weights; LUCK bends the roll (and the elite chance + the drops).
+- **THE DODGE LAW** — a real no-hit chance, capped 60%, a blue DODGE!
+  floater when it fires.
+- **THE REROLL LAW** — the shop reroll (8 + 6n) and the draft reroll
+  (6 + 6n, one FREE per break with the u3 node).
+- **THE GOGACOIN RIDER** — every 5th wave one random enemy carries the box's
+  REAL gogacoin (gold glint + CARRIER! chip + banner). It drops on death
+  (even a contact splatter coughs it up) and collecting pays +1 to the
+  GOGABox wallet via add_run_coins. A carrier alive at the wave end re-hides
+  its coin in the next wave's swarm.
+- **THE ART REBIRTH** — tools/v034p1_art.py: a real lumpy potato with six
+  geared starts + a 4-frame boot walk; 16 creatures (no more circles with
+  googly eyes); 512px seamless grounds x4; readable guns; THE COSMIC COIN
+  (gold, potato embossed) distinct from the gogacoin. The owner's uploaded
+  Twin_Stick_Shooter_Template.zip donates the fireball + 3 crystals
+  (provenance in assets.manifest.json).

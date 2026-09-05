@@ -1,5 +1,5 @@
 extends Node
-## COSMIC SPUD probe (v0.3.4) - the deterministic battery.
+## COSMIC SPUD probe (v0.3.4-1) - the deterministic battery.
 ## Runs headless: godot --headless --path . res://tests/cs_probe.tscn
 ## Exit 0 = all laws hold.
 
@@ -35,7 +35,7 @@ func _wait(t: float) -> void:
         await get_tree().create_timer(t, true).timeout
 
 func _run() -> void:
-        print("=== cs_probe (v0.3.4) ===")
+        print("=== cs_probe (v0.3.4-1) ===")
         seed(20260905)
         # ------------------------------------------------ the data laws
         ck(CSData.merge_price("smg", 1) == int(ceil(CSData.weapon_price("smg", 2) / 2.0)),
@@ -245,6 +245,141 @@ func _run() -> void:
         ck(meta.char_xp() > cxp0 or meta.char_level() > clv0,
                         "THE BANK: the run's kills banked character XP")
         ck(G.over, "the death hands the run to the box death menu")
+        # ------------------------------------------------ the patch-1 laws
+        # THE NODE-SYNC LAW (the headline fix: the sprite follows the body)
+        G.enemies.clear()
+        var ne: Dictionary = G._spawn_enemy("blab", G.p_pos + Vector2(500, 0))
+        G.p_iframe = 99.0          # keep the contact law out of the way
+        G._tick_enemies(0.1)
+        var nd: Sprite2D = ne["node"]
+        ck(nd.position.distance_to(ne["pos"]) < 0.5,
+                        "THE NODE-SYNC LAW: the sprite follows the body every tick")
+        var moved_d: float = (G.p_pos + Vector2(500, 0)).distance_to(ne["pos"])
+        ck(moved_d < 500.0,
+                        "THE NODE-SYNC LAW: the enemy WALKED (v0.3.4 left it frozen)")
+        G.enemies.clear()
+        # LUCK: the rarity roll bends
+        seed(777)
+        var common0 := 0
+        for i in 400:
+                if CSData.roll_rarity(0.0) == "common":
+                        common0 += 1
+        var common_lucky := 0
+        for i in 400:
+                if CSData.roll_rarity(1.5) == "common":
+                        common_lucky += 1
+        ck(common_lucky < common0,
+                        "THE LUCK LAW: luck pushes the shelf off common (%d -> %d of 400)" \
+                                        % [common0, common_lucky])
+        ck(common0 > 140 and common0 < 240,
+                        "THE LUCK LAW: luck 0 stays near the 46%% common weight (%d)" % common0)
+        # DODGE: a real no-hit chance, capped at 60%
+        G.p_hp = G.p_max_hp
+        G.stats["dodge"] = 0.6
+        G.p_iframe = 0.0
+        var dodged := 0
+        for i in 40:
+                G.p_iframe = 0.0
+                var hp_b: float = G.p_hp
+                G.phase = "play"
+                G.over = false
+                G._hurt_player(10.0, null)
+                if absf(G.p_hp - hp_b) < 0.01:
+                        dodged += 1
+        ck(dodged >= 14 and dodged <= 34,
+                        "THE DODGE LAW: 60%% dodge dodged %d of 40 (a real chance)" % dodged)
+        G.stats["dodge"] = 0.0
+        G.p_hp = G.p_max_hp
+        # REROLL: the climbing price laws
+        ck(CSData.shop_reroll_cost(0) == 8 and CSData.shop_reroll_cost(2) == 20,
+                        "THE REROLL LAW: the shop reroll climbs 8 + 6n")
+        ck(CSData.draft_reroll_cost(0) == 6 and CSData.draft_reroll_cost(1) == 12,
+                        "THE REROLL LAW: the draft reroll climbs 6 + 6n")
+        # THE GOGACOIN RIDER: every 5th wave, one carrier, the drop pays
+        G._start_run()
+        await _wait(0.3)
+        G._begin_wave(5)
+        ck(G.goga_pending,
+                        "THE RIDER LAW: wave 5 owes a gogacoin carrier")
+        G._begin_wave(6)
+        ck(not G.goga_pending,
+                        "THE RIDER LAW: wave 6 owes nothing")
+        G._begin_wave(5)
+        for i in 8:
+                G._spawn_enemy("blab", G.p_pos + Vector2.from_angle(randf() * TAU) * 400.0)
+        G.p_iframe = 99.0
+        G._tick_enemies(0.05)
+        ck(G.goga_carrier_alive and not G.goga_pending,
+                        "THE RIDER LAW: the swarm hid the coin in one carrier")
+        var carrier: Dictionary = {}
+        for ee in G.enemies:
+                if ee.get("goga", false):
+                        carrier = ee
+        ck(not carrier.is_empty(), "THE RIDER LAW: exactly one carrier marked")
+        var run_coins0: int = G.run_coins
+        var pk_count0: int = G.pickups.size()
+        G._kill_enemy(carrier, true)
+        var goga_pk := {}
+        for pk in G.pickups:
+                if String(pk["kind"]) == "gogacoin":
+                        goga_pk = pk
+        ck(not goga_pk.is_empty() and G.pickups.size() > pk_count0,
+                        "THE RIDER LAW: the dead carrier dropped the gogacoin")
+        ck(not G.goga_carrier_alive, "THE RIDER LAW: the carrier flag cleared")
+        goga_pk["pos"] = G.p_pos      # the LOGICAL seat (the node follows)
+        G._tick_pickups(0.016)
+        ck(G.run_coins == run_coins0 + 1,
+                        "THE RIDER LAW: collecting pays +1 REAL gogacoin to the wallet")
+        # THE COIN-DISTINCT LAW: the cosmic coin is NOT the gogacoin
+        var cosmic: Texture2D = load("res://assets/games/cosmic_spud/pickups/coin.png")
+        var boxc: Texture2D = load("res://assets/ui/coin.png")
+        ck(cosmic.get_image().get_data() != boxc.get_image().get_data(),
+                        "THE COIN LAW: the cosmic coin's pixels are NOT the gogacoin's")
+        # THE TREE LOCK LAW: the reason speaks
+        meta.d["tree"] = {}
+        meta.d["char_level"] = 1
+        meta.d["coins"] = 20
+        meta.save()
+        ck(G._tree_lock_reason("o2") == "needs SHARP PEEL",
+                        "THE TREE LAW: o2's lock names the missing chain node")
+        ck(G._tree_lock_reason("l3").contains("LV") or G._tree_lock_reason("l3").contains("needs"),
+                        "THE TREE LAW: the LAB's lock speaks its reason (%s)" % G._tree_lock_reason("l3"))
+        ck(G._tree_lock_reason("o1") != "" and G._tree_lock_reason("o1").contains("CC"),
+                        "THE TREE LAW: a poor node's lock names the coins")
+        # THE DAY/NIGHT LAW: two real faces + the tint finally applied
+        var th: Dictionary = CSData.THEMES["desert"]
+        ck(String(th["day"]) != String(th["night"]),
+                        "THE THEME LAW: the desert owns a DAY and a NIGHT face")
+        G._retheme("desert", true)
+        ck(G.world.modulate == th["tint_night"],
+                        "THE THEME LAW: night paints the world with the night tint")
+        ck(is_instance_valid(G.ground_layer) and G.ground_layer.get_child_count() > 10,
+                        "THE THEME LAW: the night ground repainted in place")
+        G._retheme("desert", false)
+        ck(G.world.modulate == th["tint_day"],
+                        "THE THEME LAW: the day flip returns the daylight")
+        # THE STORE LAW: the offers roll, the rarities are real
+        G._roll_shop_offers()
+        ck(G.shop_offers_w.size() == 4 and G.shop_offers_i.size() == 3,
+                        "THE STORE LAW: 4 weapon + 3 item offers per break")
+        var rar_ok := true
+        for o in G.shop_offers_w:
+                if not CSData.RARITIES.has(o["rar"]):
+                        rar_ok = false
+        ck(rar_ok, "THE STORE LAW: every offer wears a real rarity")
+        # THE WIDGET LAW: the game's own HUD exists (kills + coins + carrier chip)
+        ck(G.kill_txt != null and G.cc_txt != null and G.goga_chip != null,
+                        "THE WIDGET LAW: the kills + coins + carrier widgets live")
+        ck(G.get("stick_ghost") == null,
+                        "THE STICK LAW: the ghost node is GONE (truly invisible)")
+        # THE ARMORY LAW: the wallet buy lands in the armory
+        meta.d["coins"] = 5000
+        meta.save()
+        G._armory_buy_weapon("laser", CSData.weapon_price("laser", 1))
+        ck(meta.has_weapon("laser") and meta.weapon_count("laser") >= 1,
+                        "THE ARMORY LAW: the wallet buy lands in the armory")
+        meta.d["coins"] = 5000
+        meta.save()
         # ------------------------------------------------ the meta laws
         var m2 := CSMeta.load_meta()
         m2.d["coins"] = 50

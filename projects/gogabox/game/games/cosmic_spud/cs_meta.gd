@@ -36,6 +36,7 @@ func _heal() -> void:
                 "merges": 0,
                 "banked_total": 0,
                 "runs": 0,
+                "gogacoins": 0,             # the every-5th-wave riders, lifetime
         }
         for k in base:
                 if not d.has(k):
