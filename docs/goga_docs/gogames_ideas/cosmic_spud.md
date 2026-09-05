@@ -315,3 +315,30 @@ The owner's v0.3.4 verdict: 0.5/10. The full defect list + the fixes live in
   (gold, potato embossed) distinct from the gogacoin. The owner's uploaded
   Twin_Stick_Shooter_Template.zip donates the fireball + 3 crystals
   (provenance in assets.manifest.json).
+
+## 15. THE PATCH-2 LAWS (v0.3.4-2 — the owner's locked-out round)
+
+- **THE SHEET LIFE LAW** — every CS sheet pauses the tree, so the sheet
+  chain wears PROCESS_MODE_ALWAYS (the box's own sheet_push crown).
+  A paused tree eats every tap aimed at a PAUSABLE control; the kit's
+  buttons must always answer. Probe: emit `pressed` on DROP IN under the
+  paused tree — the run starts.
+- **THE DOOR LAW** — the optionals is THE DOOR: no X (`closable=false`),
+  and back (HUD "<" and Android, both landing in `_back_pressed`) never
+  closes it during boot. Back over the door speaks the red hint
+  ("the door is locked - pick a start, then DROP IN"); back closes only
+  sheets stacked OVER the door. Over a running game: top sheet → close,
+  else the box pause — the same law as every other game.
+- **THE TEXT-FIT LAW** — the CSUI measures what it renders (Kenney_Mini
+  loaded explicitly; `_cs_text_w/_cs_text_h/_cs_fit_label`). No CSUI box
+  may guess a fixed size under autowrapped text: start/draft/tree cards
+  grow past their floors to their measured content.
+- **THE HUG LAW** — a sheet's scroll hugs its shelf's measured minimum
+  (`_fit_scroll`), capped at the viewport fraction. No tall empty gray
+  voids.
+- **THE ECONOMY BORDER LAW** — PLACES (themes) are GOGACoin purchases
+  from the BOX wallet (`Box.spend` + `Box.buy_item`, priced in the
+  THEMES data as `gogacoins`: park 400, desert free-default). Guns,
+  allies and everything in-run cost COSMIC coins. Both wallets are named
+  in the optionals line; the armory themes tab wears the green GOGACoin
+  chip and says which side of the border each currency owns.

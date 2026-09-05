@@ -232,8 +232,10 @@ const TREE_ORDER := ["o1", "o2", "o3", "o4", "o5", "d1", "d2", "d3", "d4",
         "u1", "u2", "u3", "u4", "l1", "l2", "l3", "l4", "l5"]
 
 # =================================================================== THEMES
+## THE ECONOMY BORDER LAW (v0.3.4-2): places are GOGACoin purchases (the
+## owner's universal-shop law) - "gogacoins" is the BOX wallet price.
 const THEMES := {
-        "desert": {"name": "DECAYED DESERT", "price": 0,
+        "desert": {"name": "DECAYED DESERT", "gogacoins": 0,
                 "day": "res://assets/games/cosmic_spud/ground/desert_day.png",
                 "night": "res://assets/games/cosmic_spud/ground/desert_night.png",
                 "day_music": "res://assets/audio/music/cs_desert_day.ogg",
@@ -241,7 +243,7 @@ const THEMES := {
                 "props": ["rock", "skull", "crate", "barrel", "shrub"],
                 "night_props": ["rock", "skull", "barrel"],
                 "tint_day": Color(1, 1, 1), "tint_night": Color(0.62, 0.66, 0.95)},
-        "park": {"name": "ABANDONED PARK", "price": 800,
+        "park": {"name": "ABANDONED PARK", "gogacoins": 400,
                 "day": "res://assets/games/cosmic_spud/ground/park_day.png",
                 "night": "res://assets/games/cosmic_spud/ground/park_night.png",
                 "day_music": "res://assets/audio/music/cs_park_day.ogg",

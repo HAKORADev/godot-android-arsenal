@@ -40,6 +40,7 @@ var fx: Node2D                   # the _draw overlay (rings, auras, beams)
 var cam: Camera2D
 
 var phase := "boot"               # boot | play | break | dead
+var _boot_hint := ""              # the door speaks here (THE BACK LAW)
 var theme_id := "desert"
 var night := false
 var start_id := "soldier"
@@ -187,9 +188,46 @@ func _cs_panel_style() -> StyleBoxFlat:
         st.content_margin_bottom = 10
         return st
 
+## THE CS FONT (v0.3.4-2): the game wears Kenney_Mini explicitly - the CSUI
+## measures what it renders, so the font must be a FACT, not a fallback.
+var _font_cs: Font = null
+
+func _cs_font() -> Font:
+        if _font_cs == null:
+                _font_cs = load("res://assets/fonts/Kenney_Mini.ttf")
+        return _font_cs
+
+## THE TEXT-FIT LAW (v0.3.4-2, the owner: "the text is out-of-box, make the
+## box dynamically fit the text"): no CSUI box may GUESS its size. Measure
+## the real string with the real font, then size the box to the measurement.
+func _cs_text_w(txt: String, sz: int) -> float:
+        return _cs_font().get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, sz).x
+
+func _cs_text_h(txt: String, sz: int, w: float) -> float:
+        return _cs_font().get_multiline_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT,
+                        w, sz, -1, TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND
+                        | TextServer.BREAK_ADAPTIVE).y
+
+## a label that steps its own font size down until it fits max_w
+func _cs_fit_label(txt: String, sz: int, col: Color, max_w: float,
+                min_sz := 8) -> Label:
+        var s := sz
+        while s > min_sz and _cs_text_w(txt, s) > max_w:
+                s -= 1
+        return _cs_label(txt, s, col)
+
+## THE HUG LAW (v0.3.4-2): a sheet's scroll area HUGS its content - a tall
+## empty gray void under three cards is slop. The scroll grows to the shelf's
+## measured minimum, capped at the viewport fraction so big shelves still scroll.
+func _fit_scroll(scroll: ScrollContainer, shelf: Control, frac: float) -> void:
+        var cap: float = get_viewport_rect().size.y * frac
+        scroll.custom_minimum_size.y = clampf(
+                        shelf.get_combined_minimum_size().y + 8.0, 120.0, cap)
+
 func _cs_label(txt: String, sz: int, col: Color, parent: Node = null) -> Label:
         var l := Label.new()
         l.text = txt
+        l.add_theme_font_override("font", _cs_font())
         l.add_theme_font_size_override("font_size", sz)
         l.add_theme_color_override("font_color", col)
         if parent != null:
@@ -199,6 +237,7 @@ func _cs_label(txt: String, sz: int, col: Color, parent: Node = null) -> Label:
 func _cs_button(txt: String, sz: int, col: Color, cb: Callable) -> Button:
         var b := Button.new()
         b.text = txt
+        b.add_theme_font_override("font", _cs_font())
         b.add_theme_font_size_override("font_size", sz)
         b.add_theme_color_override("font_color", col)
         b.add_theme_color_override("font_hover_color", col.lightened(0.25))
@@ -237,7 +276,8 @@ var cs_sheets: Array = []         # [{dim, panel, box, id}]
 func sheet_open_count() -> int:
         return cs_sheets.size()
 
-func _cs_open(title: String, build: Callable, col: Color = CS_YELLOW) -> VBoxContainer:
+func _cs_open(title: String, build: Callable, col: Color = CS_YELLOW,
+                closable := true) -> VBoxContainer:
         get_tree().paused = true
         paused = true
         var root := _overlay_root_ref()
@@ -246,6 +286,13 @@ func _cs_open(title: String, build: Callable, col: Color = CS_YELLOW) -> VBoxCon
         dim.color = Color(0, 0, 0, 0.52)
         dim.set_anchors_preset(Control.PRESET_FULL_RECT)
         dim.mouse_filter = Control.MOUSE_FILTER_STOP
+        ## THE SHEET LIFE LAW (v0.3.4-2 - THE owner-report killer): every CS
+        ## sheet PAUSES the tree, and a paused tree eats every tap aimed at a
+        ## PAUSABLE control - the NIGHT chip, DROP IN, THE ARMORY, the X, all
+        ## dead on device while the same taps worked headless. The box's own
+        ## sheet_push has dressed its chain PROCESS_MODE_ALWAYS since
+        ## v0.3.3-p2; the CS kit now wears the same crown.
+        dim.process_mode = Node.PROCESS_MODE_ALWAYS
         root.add_child(dim)
         var center := CenterContainer.new()
         center.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -268,9 +315,11 @@ func _cs_open(title: String, build: Callable, col: Color = CS_YELLOW) -> VBoxCon
         var tl := _cs_label(title, 19, col)
         tl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
         bh.add_child(tl)
-        var x := _cs_button("X", 16, CS_RED, func(): _cs_close_top())
-        bh.add_child(x)
-        var sheet := {"dim": dim, "panel": panel, "box": box, "id": "cs"}
+        if closable:
+                var x := _cs_button("X", 16, CS_RED, func(): _cs_close_top())
+                bh.add_child(x)
+        var sheet := {"dim": dim, "panel": panel, "box": box, "id": "cs",
+                        "closable": closable}
         cs_sheets.append(sheet)
         build.call(box)
         return box
@@ -306,8 +355,22 @@ func _cs_reopen(build: Callable) -> void:
                         paused = false
         build.call()
 
-## the back law: a CS sheet closes first, else the box pause takes it
+## THE BACK LAW (v0.3.4-2 - THE DOOR): the HUD "<" and the Android back both
+## land here. Over a RUNNING game a CS sheet closes first, else the box pause
+## takes it (the same behavior as every other game). During the BOOT the
+## optionals is THE DOOR - back may never close it (the owner: closing it
+## froze the game with no way back in). An armory/tree sheet over the door
+## closes and the door shows again; the door itself just speaks.
 func _back_pressed() -> void:
+        if phase == "boot":
+                if cs_sheets.size() > 1:
+                        _cs_close_top()
+                elif not cs_sheets.is_empty():
+                        _boot_hint = "the door is locked - pick a start, then DROP IN"
+                        _cs_reopen(func(): _optionals_open())
+                else:
+                        _optionals_open()
+                return
         if not cs_sheets.is_empty():
                 _cs_close_top()
                 return
@@ -381,8 +444,6 @@ func _scatter_props(theme: Dictionary) -> void:
         var n := 30
         for i in n:
                 var k: String = kinds[rng.randi() % kinds.size()]
-                if not _tex.has(k) and not _tex.has(k):
-                        pass
                 var tex: Texture2D = _t(k) if k in ["rock", "skull", "crate", "barrel",
                                 "tree", "bench", "fence", "shrub", "ferris",
                                 "crystal1", "crystal2", "crystal3"] else _t(String(k))
@@ -1892,7 +1953,6 @@ func _build_draft(box: VBoxContainer) -> void:
 
 func _draft_card(d: Dictionary) -> Button:
         var b := Button.new()
-        b.custom_minimum_size = Vector2(240, 130)
         var risky: bool = not (d["down"] as Dictionary).is_empty()
         var st := _cs_box_style(CS_GREEN if not risky else CS_RED, CS_BOX)
         st.corner_radius_top_left = 12
@@ -1909,13 +1969,18 @@ func _draft_card(d: Dictionary) -> Button:
         vb.offset_top = 10
         vb.offset_right = -8
         b.add_child(vb)
-        var up := _cs_label(String(d["t"]), 17, CS_GREEN)
+        var up_txt := String(d["t"])
+        var up := _cs_fit_label(up_txt, 17, CS_GREEN, 224.0)
         up.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         vb.add_child(up)
-        var dn := _cs_label(String(d["d"]), 13, CS_RED if risky else CS_WHITE)
+        var dn_txt := String(d["d"])
+        var dn := _cs_label(dn_txt, 13, CS_RED if risky else CS_WHITE)
         dn.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         dn.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
         vb.add_child(dn)
+        ## THE TEXT-FIT LAW: the card grows to its wrapped description
+        var dn_h := _cs_text_h(dn_txt, 13, 224.0)
+        b.custom_minimum_size = Vector2(240, maxf(130.0, 10.0 + 24.0 + 4.0 + dn_h + 14.0))
         b.pressed.connect(func():
                 _apply_draft(d)
                 Jukebox.sfx("cs_draft", -4.0)
@@ -2261,6 +2326,7 @@ func _build_shop(box: VBoxContainer) -> void:
                             CS_EDGE, "SELL +%d CC" % refund, CS_RED, func():
                             _shop_sell_weapon(wr_d, refund), keep))
         _cards_row(shelf, lcards)
+        _fit_scroll(scroll, shelf, 0.5)
         # ---- the actions
         var actions := HBoxContainer.new()
         actions.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -2437,6 +2503,17 @@ func _build_armory(box: VBoxContainer) -> void:
         hh.add_child(_cs_label(str(meta.coins()), 18, CS_YELLOW))
         _cs_label("SPUDNIK LV %d - tier cap T%d" % [meta.char_level(), meta.tier_cap()],
                         12, CS_BLUE, head)
+        if _armory_tab == "themes":
+                var gcbox := _cs_black_box(head, Vector2(190, 34))
+                var gh := HBoxContainer.new()
+                gcbox.add_child(gh)
+                var ic2 := TextureRect.new()
+                ic2.texture = _t("gogacoin")
+                ic2.custom_minimum_size = Vector2(22, 22)
+                ic2.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+                ic2.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+                gh.add_child(ic2)
+                gh.add_child(_cs_label("%d GOGACoins" % Box.coins(), 14, CS_GREEN))
         # the tabs
         var tabs := HBoxContainer.new()
         tabs.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -2464,6 +2541,7 @@ func _build_armory(box: VBoxContainer) -> void:
                 "allies": _armory_allies(shelf)
                 "themes": _armory_themes(shelf)
                 "loadout": _armory_loadout(shelf)
+        _fit_scroll(scroll, shelf, 0.54)
         # the actions
         var actions := HBoxContainer.new()
         actions.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -2551,24 +2629,28 @@ func _armory_buy_ally(aid: String, price: int) -> void:
         _cs_reopen(func(): _armory_open())
 
 func _armory_themes(shelf: VBoxContainer) -> void:
-        var note := _cs_label("each theme wears a DAY and a NIGHT face - switch in the optionals",
+        ## THE ECONOMY BORDER LAW (v0.3.4-2): PLACES cost GOGACOINS - the box
+        ## wallet, exactly like the matcher skins - while guns, allies and
+        ## everything in-run cost cosmic coins. The tab says both sides.
+        var note := _cs_label("places cost GOGACOINS (your GOGABox wallet) - guns, allies and everything in-run cost cosmic coins",
                         11, CS_WHITE)
         note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+        note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
         shelf.add_child(note)
         var rows := []
         for tid in CSData.THEME_ORDER:
             var tid_s: String = tid
             var th: Dictionary = CSData.THEMES[tid_s]
             var owned := meta.has_theme(tid_s)
-            var price: int = int(th["price"])
+            var price: int = int(th["gogacoins"])
             var on := theme_id == tid_s
             var lines := ["day + night variants"]
             if on:
                     lines.append("WORN NOW")
-            var can := not owned and meta.coins() >= price
+            var can := not owned and Box.coins() >= price
             rows.append(_shop_card(String(th["name"]), CS_YELLOW if on else (CS_GREEN if owned else CS_WHITE),
                             lines, CS_YELLOW if on else (CS_GREEN if owned else CS_EDGE),
-                            "WORN" if on else ("OWNED" if owned else "BUY %d CC" % price),
+                            "WORN" if on else ("OWNED" if owned else "BUY %d GOGACOINS" % price),
                             CS_GREEN if on else CS_YELLOW, func():
                             _armory_buy_theme(tid_s, price), not on and can))
         _cards_grid(shelf, rows, 2)
@@ -2578,14 +2660,19 @@ func _armory_buy_theme(tid: String, price: int) -> void:
                 _retheme(tid, night)
                 _cs_reopen(func(): _armory_open())
                 return
-        if not meta.spend(price):
+        ## the box wallet pays (Box.spend), the box records the place
+        if not Box.spend(price):
                 Jukebox.sfx("cs_error", -6.0)
-                _toast_show("not enough coins")
+                _toast_show("need %d more GOGACoins" % maxi(0, price - Box.coins()))
                 return
+        Box.buy_item(game_id, "theme", tid, 0)
         meta.own_theme(tid)
         _retheme(tid, night)
         Jukebox.sfx("cs_buy", -4.0)
-        _cs_reopen(func(): _armory_open())
+        if phase == "boot":
+                _cs_reopen(func(): _optionals_open())
+        else:
+                _cs_reopen(func(): _armory_open())
 
 func _armory_loadout(shelf: VBoxContainer) -> void:
         var info := _cs_label("the guns SPUDNIK drops in with (tap to toggle) - %d/%d slots" \
@@ -2658,13 +2745,19 @@ func _armory_sell(wid: String, tier: int, refund: int) -> void:
 ## the 6 start cards wear the NEW potato art, the themes are two cards with
 ## real DAY/NIGHT chips, THE ARMORY + THE TREE + DROP IN.
 func _optionals_open() -> void:
+        ## closable=false: THE DOOR (v0.3.4-2, the owner: "why could someone
+        ## close the important window?") - no X, and the back law guards it.
         _cs_open("COSMIC SPUD", func(box: VBoxContainer): _build_optionals(box),
-                        CS_YELLOW)
+                        CS_YELLOW, false)
 
 func _build_optionals(box: VBoxContainer) -> void:
         var sub := _cs_label("pick one of the six starts - SPUDNIK wears every mask", 12, CS_WHITE)
         sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         box.add_child(sub)
+        if not _boot_hint.is_empty():
+                var hint := _cs_label(_boot_hint, 12, CS_RED)
+                hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+                box.add_child(hint)
         # the six start cards (2 rows x 3)
         var scroll := ScrollContainer.new()
         scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -2693,11 +2786,12 @@ func _build_optionals(box: VBoxContainer) -> void:
         shelf.add_child(trow)
         for tid in CSData.THEME_ORDER:
                 trow.add_child(_theme_card(tid))
-        # the wallet line
-        var info := _cs_label("SPUDNIK level %d   -   %d cosmic coins   -   weapon tier cap T%d" \
-                        % [meta.char_level(), meta.coins(), meta.tier_cap()], 12, CS_YELLOW)
+        # the wallet line - BOTH currencies, named (THE ECONOMY BORDER LAW)
+        var info := _cs_label("LV %d   -   %d cosmic coins   -   tier cap T%d   -   %d GOGACoins" \
+                        % [meta.char_level(), meta.coins(), meta.tier_cap(), Box.coins()], 12, CS_YELLOW)
         info.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         shelf.add_child(info)
+        _fit_scroll(scroll, shelf, 0.5)
         # the actions
         var actions := HBoxContainer.new()
         actions.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -2710,7 +2804,6 @@ func _build_optionals(box: VBoxContainer) -> void:
 func _start_card(sid: String) -> Button:
         var s: Dictionary = CSData.STARTS[sid]
         var b := Button.new()
-        b.custom_minimum_size = Vector2(230, 148)
         var picked: bool = sid == start_id
         var st := _cs_box_style(CS_YELLOW if picked else CS_EDGE, CS_BOX)
         st.corner_radius_top_left = 12
@@ -2730,6 +2823,7 @@ func _start_card(sid: String) -> Button:
         b.add_child(vb)
         var hrow := HBoxContainer.new()
         hrow.alignment = BoxContainer.ALIGNMENT_CENTER
+        hrow.add_theme_constant_override("separation", 8)
         vb.add_child(hrow)
         var art := TextureRect.new()
         art.texture = _t("hero_" + sid + "_f0")
@@ -2737,25 +2831,42 @@ func _start_card(sid: String) -> Button:
         art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
         art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
         hrow.add_child(art)
-        var nm := _cs_label(String(s["name"]), 14, s["tint"])
-        nm.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-        hrow.add_child(nm)
-        var st_txt := _cs_label("HP %d  DMG %d%%  SPD %d%%\nASPD %d%%  RNG %d%%  ARM %d  LUCK %d%%  DODGE %d%%" % [
+        ## THE TEXT-FIT LAW: the card is MEASURED, never guessed. The stats
+        ## lines set the width floor, the wrapped perk sets the height floor -
+        ## the box grows to fit the text, so nothing can spill out again.
+        var stats_txt := "HP %d  DMG %d%%  SPD %d%%\nASPD %d%%  RNG %d%%  ARM %d  LUCK %d%%  DODGE %d%%" % [
                 int(s["hp"]), int(s["dmg"] * 100), int(s["spd"] * 100),
                 int(s["aspeed"] * 100), int(s["range"] * 100), int(s["armor"]),
-                int(round(float(s.get("luck", 0.0)) * 100)), int(round(float(s.get("dodge", 0.0)) * 100))],
-                10, CS_WHITE)
+                int(round(float(s.get("luck", 0.0)) * 100)), int(round(float(s.get("dodge", 0.0)) * 100))]
+        var w1 := _cs_text_w(stats_txt.split("\n")[0], 10)
+        var w2 := _cs_text_w(stats_txt.split("\n")[1], 10)
+        var stats_w: float = maxf(w1, w2)
+        var cw: float = maxf(stats_w, 214.0)
+        var nm := _cs_fit_label(String(s["name"]), 14, s["tint"], maxf(90.0, cw - 62.0))
+        nm.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+        hrow.add_child(nm)
+        var st_txt := _cs_label(stats_txt, 10, CS_WHITE)
         st_txt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         vb.add_child(st_txt)
-        var pk := _cs_label(String(s["perk"]), 10, CS_GREEN)
+        var perk_txt := String(s["perk"])
+        var pk := _cs_label(perk_txt, 10, CS_GREEN)
         pk.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         pk.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-        pk.custom_minimum_size = Vector2(214, 0)
+        pk.custom_minimum_size = Vector2(cw, 0)
+        pk.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
         vb.add_child(pk)
+        var perk_h := _cs_text_h(perk_txt, 10, cw)
+        var stats_h := _cs_text_h(stats_txt, 10, cw)
+        var name_w := _cs_text_w(String(s["name"]), 14)
+        var tag_h := 15.0 if picked else 0.0
         if picked:
                 var tag := _cs_label("PICKED", 10, CS_YELLOW)
                 tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
                 vb.add_child(tag)
+        # 6 top offset + 52 art + 3 separations + bottom air + stylebox margins
+        var min_h := 6.0 + 52.0 + 3.0 + stats_h + perk_h + tag_h + 8.0 + 12.0
+        var min_w: float = maxf(230.0, maxf(stats_w + 34.0, 62.0 + name_w + 26.0))
+        b.custom_minimum_size = Vector2(min_w, maxf(148.0, min_h))
         b.pressed.connect(func():
                 start_id = sid
                 meta.d["last_start"] = sid
@@ -2775,8 +2886,8 @@ func _theme_card(tid: String) -> PanelContainer:
         var vb := VBoxContainer.new()
         vb.add_theme_constant_override("separation", 4)
         card.add_child(vb)
-        var nm := _cs_label(String(th["name"]) + ("  - WORN" if worn else ""), 13,
-                        CS_YELLOW if worn else CS_WHITE)
+        var nm := _cs_fit_label(String(th["name"]) + ("  - WORN" if worn else ""), 13,
+                        CS_YELLOW if worn else CS_WHITE, 268.0)
         nm.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         vb.add_child(nm)
         var chips := HBoxContainer.new()
@@ -2791,12 +2902,18 @@ func _theme_card(tid: String) -> PanelContainer:
                 chips.add_child(day_b)
                 chips.add_child(nite_b)
         else:
-                var buy_b := _cs_button("BUY %d CC" % int(th["price"]), 12, CS_YELLOW,
-                                func(): _armory_open(); _armory_tab = "themes")
+                ## THE ECONOMY BORDER LAW (v0.3.4-2, the owner: places are
+                ## GOGACoin purchases - "i have clearly listed exactly what to
+                ## be bought using gogacoins"): the card charges the BOX wallet
+                ## directly and says so, in full words, no bare "CC".
+                var price: int = int(th["gogacoins"])
+                var buy_b := _cs_button("BUY %d GOGACOINS" % price, 12, CS_YELLOW,
+                                func(): _armory_buy_theme(tid, price))
                 chips.add_child(buy_b)
         return card
 
 func _start_run() -> void:
+        _boot_hint = ""
         _cs_close_all()
         _start_id_persist()
         run_wave = 1
@@ -2872,6 +2989,7 @@ func _build_tree(box: VBoxContainer) -> void:
                         col.add_child(nb)
                         prev = nb
                 cols.add_child(col)
+        _fit_scroll(scroll, shelf, 0.48)
         var actions := HBoxContainer.new()
         actions.alignment = BoxContainer.ALIGNMENT_CENTER
         box.add_child(actions)
@@ -2894,7 +3012,6 @@ func _tree_node(nid: String, prev: Button) -> Button:
         var lv_ok: bool = meta.char_level() >= int(n["clv"])
         var can: bool = chain_ok and lv_ok and meta.coins() >= int(n["cost"])
         var b := Button.new()
-        b.custom_minimum_size = Vector2(180, 68)
         var st := _cs_box_style(
                         CS_GREEN if owned else (CS_YELLOW if can else CS_EDGE), CS_BOX)
         b.add_theme_stylebox_override("normal", st)
@@ -2911,26 +3028,41 @@ func _tree_node(nid: String, prev: Button) -> Button:
         var head := HBoxContainer.new()
         head.alignment = BoxContainer.ALIGNMENT_CENTER
         vb.add_child(head)
+        var tag_txt := ""
         if owned:
+                tag_txt = "[OWNED] "
                 head.add_child(_cs_label("[OWNED]", 10, CS_GREEN))
         elif not (chain_ok and lv_ok):
+                tag_txt = "[LOCKED] "
                 head.add_child(_cs_label("[LOCKED]", 10, CS_RED))
-        head.add_child(_cs_label(String(n["name"]), 11,
-                        CS_GREEN if owned else (CS_WHITE if chain_ok and lv_ok else Color(0.55, 0.55, 0.6))))
-        var ds := _cs_label(String(n["desc"]), 9, CS_WHITE)
+        var nm_txt := tag_txt + String(n["name"])
+        head.add_child(_cs_fit_label(nm_txt, 11,
+                        CS_GREEN if owned else (CS_WHITE if chain_ok and lv_ok else Color(0.55, 0.55, 0.6)),
+                        150.0))
+        var ds_txt := String(n["desc"])
+        var ds := _cs_label(ds_txt, 9, CS_WHITE)
         ds.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         ds.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
         vb.add_child(ds)
         var foot := HBoxContainer.new()
         foot.alignment = BoxContainer.ALIGNMENT_CENTER
         vb.add_child(foot)
+        var foot_txt := ""
         if owned:
-                foot.add_child(_cs_label("learned", 9, CS_GREEN))
+                foot_txt = "learned"
+                foot.add_child(_cs_label(foot_txt, 9, CS_GREEN))
         elif chain_ok and lv_ok:
-                foot.add_child(_cs_label("%d CC" % int(n["cost"]), 10,
+                foot_txt = "%d CC" % int(n["cost"])
+                foot.add_child(_cs_label(foot_txt, 10,
                                 CS_YELLOW if can else CS_RED))
         else:
-                foot.add_child(_cs_label(_tree_lock_reason(nid), 9, CS_RED))
+                foot_txt = _tree_lock_reason(nid)
+                foot.add_child(_cs_label(foot_txt, 9, CS_RED))
+        ## THE TEXT-FIT LAW: desc + reason wrap, the node grows to fit them
+        var ds_h := _cs_text_h(ds_txt, 9, 160.0)
+        var foot_h := _cs_text_h(foot_txt, 9, 160.0)
+        b.custom_minimum_size = Vector2(180,
+                        maxf(68.0, 4.0 + 16.0 + 2.0 + ds_h + 2.0 + maxf(14.0, foot_h) + 6.0))
         b.pressed.connect(func():
                 if owned:
                         _toast_show("already learned")

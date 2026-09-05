@@ -16,6 +16,25 @@ func ck(cond: bool, what: String) -> void:
                 fails += 1
                 print("[FAIL] ", what)
 
+## the first Button under `root` whose text matches (or null)
+func _find_btn(root: Node, txt: String) -> Button:
+        for c in root.get_children():
+                if c is Button and String(c.text) == txt:
+                        return c
+                var deep := _find_btn(c, txt)
+                if deep != null:
+                        return deep
+        return null
+
+func _find_btn_like(root: Node, frag: String) -> Button:
+        for c in root.get_children():
+                if c is Button and String(c.text).contains(frag):
+                        return c
+                var deep := _find_btn_like(c, frag)
+                if deep != null:
+                        return deep
+        return null
+
 func _boot() -> void:
         if G != null and is_instance_valid(G):
                 G.queue_free()
@@ -393,6 +412,70 @@ func _run() -> void:
         m2.d["char_level"] = 1
         m2.save()
         ck(not m2.tree_can_buy("l3"), "THE TREE LAW: the WEAPON LAB gates at LV4")
+        # ============================== v0.3.4-2 - THE OWNER'S SECOND REPORT
+        # THE DOOR LAW: rebuild the door fresh (the owner could not get past
+        # the optionals - every tap was a dud and back froze the game)
+        G.phase = "boot"
+        G._boot_hint = ""
+        G._cs_close_all()
+        G._optionals_open()
+        await _wait(0.2)
+        ck(get_tree().paused and G.sheet_open_count() == 1,
+                        "THE DOOR LAW: the optionals is up and the tree is paused")
+        var door_box: VBoxContainer = G.cs_sheets[0]["box"]
+        ck(_find_btn(door_box, "X") == null,
+                        "THE DOOR LAW: the optionals wears NO X (the door cannot be closed)")
+        ck(_find_btn_like(door_box, "GOGACOINS") != null,
+                        "THE BORDER LAW: the un-owned place says GOGACOINS, never bare CC")
+        G._back_pressed()
+        ck(G.sheet_open_count() == 1 and G._boot_hint != "",
+                        "THE DOOR LAW: back on the door speaks - it never closes it")
+        G._armory_open()
+        ck(G.sheet_open_count() == 2, "THE DOOR LAW: the armory stacks over the door")
+        G._back_pressed()
+        ck(G.sheet_open_count() == 1,
+                        "THE DOOR LAW: back over the door closes the TOP sheet only")
+        # THE BORDER LAW: the park charges the BOX wallet, cosmic coins untouched
+        var goga_before := Box.coins()
+        var cosmic_before := meta.coins()
+        Box.earn(1000)
+        G._armory_buy_theme("park", int(CSData.THEMES["park"]["gogacoins"]))
+        await _wait(0.2)
+        ck(meta.has_theme("park"), "THE BORDER LAW: the park is owned after the buy")
+        ck(Box.coins() == goga_before + 1000 - int(CSData.THEMES["park"]["gogacoins"]),
+                        "THE BORDER LAW: the buy drained the GOGACoin wallet")
+        ck(meta.coins() == cosmic_before,
+                        "THE BORDER LAW: the cosmic wallet never paid for a place")
+        ck(G.sheet_open_count() == 1,
+                        "THE BORDER LAW: the buy from the boot reopens the DOOR")
+        door_box = G.cs_sheets[0]["box"]
+        ck(_find_btn(door_box, "NIGHT") != null,
+                        "THE BORDER LAW: the owned place now wears DAY/NIGHT chips")
+        # THE SHEET LIFE LAW: the tap answers UNDER THE PAUSED TREE (the owner's
+        # killer: v0.3.4-1's sheet chain inherited PAUSABLE - every button was
+        # a dud on device while the probes, which call functions directly,
+        # never saw it)
+        var drop_b := _find_btn(door_box, "DROP IN")
+        ck(drop_b != null, "THE SHEET LIFE LAW: DROP IN exists on the door")
+        if drop_b != null:
+                drop_b.pressed.emit()
+                await _wait(0.4)
+                ck(G.phase == "play" and G.run_wave == 1,
+                                "THE SHEET LIFE LAW: the paused tree answers the tap - the run starts")
+        # THE TEXT-FIT LAW: the boxes grow to their text (the overflow report)
+        var sc: Button = G._start_card("engineer")
+        var perk_h: float = G._cs_text_h(String(CSData.STARTS["engineer"]["perk"]), 10, 214.0)
+        var stats_h: float = G._cs_text_h("HP 0  DMG 0%  SPD 0%\nASPD 0%  RNG 0%  ARM 0  LUCK 0%  DODGE 0%", 10, 214.0)
+        ck(sc.custom_minimum_size.y >= 81.0 + perk_h + stats_h,
+                        "THE TEXT-FIT LAW: the start card grows to fit its measured text")
+        ck(G._cs_text_w("ENGINEER", 14) > 0.0,
+                        "THE TEXT-FIT LAW: the measurer measures with the real font")
+        var dc: Button = G._draft_card(CSData.WAVE_DRAFTS[0])
+        ck(dc.custom_minimum_size.y >= 130.0,
+                        "THE TEXT-FIT LAW: the draft card keeps its floor and grows past it")
+        var tn: Button = G._tree_node("o2", null)
+        ck(tn.custom_minimum_size.y >= 68.0,
+                        "THE TEXT-FIT LAW: the tree node keeps its floor and grows past it")
         # fresh probe exit
         Box.reset_all()
         print("=== cs_probe: %d checks, %d fails ===" % [checks, fails])
